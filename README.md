@@ -60,3 +60,4 @@ The backend logic lives in `pawpal_system.py`, the CLI demo lives in `main.py`, 
 │   └── uml_final.mmd
 └── tests/
     └── test_pawpal.py
+```
