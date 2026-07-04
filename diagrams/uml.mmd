@@ -20,23 +20,33 @@ classDiagram
 
     class Task {
         +str description
+        +str due_date
         +str due_time
         +int duration_minutes
         +str priority
+        +str frequency
         +bool completed
         +mark_complete()
         +is_pending()
+        +start_datetime()
+        +end_datetime()
+        +priority_value()
+        +next_occurrence()
     }
 
     class Scheduler {
-        +list pets
+        +Owner owner
         +get_all_tasks()
-        +sort_tasks_by_due_time()
+        +sort_tasks_by_due_time(tasks)
+        +sort_tasks_by_priority(tasks)
+        +filter_tasks(pet_name, completed, priority)
+        +filter_by_pet(pet_name)
         +filter_pending_tasks()
+        +complete_task(pet, task)
         +detect_conflicts()
     }
 
     Owner "1" --> "*" Pet : owns
     Pet "1" --> "*" Task : has
-    Scheduler --> "*" Pet : manages
-    Scheduler --> "*" Task : organizes
+    Scheduler --> Owner : reads
+    Scheduler --> Task : organizes

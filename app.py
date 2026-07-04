@@ -1,6 +1,8 @@
+from datetime import date
+
 import streamlit as st
 
-from pawpal_system import Owner, Pet, Task, Scheduler
+from pawpal_system import Owner, Pet, Scheduler, Task
 
 
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="wide")
@@ -9,10 +11,11 @@ st.title("🐾 PawPal+")
 st.write("A smart pet care planner for organizing daily tasks across multiple pets.")
 
 
-# Streamlit reruns the file after every interaction, so we store the Owner object
-# in session_state to keep pets and tasks alive during the browser session.
 if "owner" not in st.session_state:
     st.session_state.owner = Owner("Demo Owner", "owner@example.com")
+
+if "last_message" in st.session_state:
+    st.success(st.session_state.pop("last_message"))
 
 
 owner = st.session_state.owner
@@ -36,7 +39,7 @@ st.header("1. Add a Pet")
 
 with st.form("add_pet_form"):
     pet_name = st.text_input("Pet name")
-    pet_species = st.text_input("Species")
+    pet_species = st.text_input("Species", placeholder="Dog, Cat, Rabbit...")
     pet_age = st.number_input("Age", min_value=0, max_value=40, step=1)
     add_pet_button = st.form_submit_button("Add Pet")
 
@@ -60,7 +63,11 @@ else:
 
     with st.form("add_task_form"):
         selected_pet_name = st.selectbox("Choose pet", pet_names)
-        task_description = st.text_input("Task description", placeholder="Morning walk, feeding, medication...")
+        task_description = st.text_input(
+            "Task description",
+            placeholder="Morning walk, feeding, medication..."
+        )
+        due_date = st.date_input("Due date", value=date.today())
         due_time = st.time_input("Due time")
         duration_minutes = st.number_input("Duration in minutes", min_value=5, max_value=240, step=5)
         priority = st.selectbox("Priority", ["high", "medium", "low"])
@@ -69,15 +76,16 @@ else:
 
         if add_task_button:
             selected_pet = next(pet for pet in pets if pet.name == selected_pet_name)
-            task = Task(
-                description=task_description,
-                due_time=due_time.strftime("%H:%M"),
-                duration_minutes=int(duration_minutes),
-                priority=priority,
-                frequency=frequency
-            )
 
             if task_description:
+                task = Task(
+                    description=task_description,
+                    due_time=due_time.strftime("%H:%M"),
+                    duration_minutes=int(duration_minutes),
+                    priority=priority,
+                    frequency=frequency,
+                    due_date=due_date.isoformat()
+                )
                 selected_pet.add_task(task)
                 st.success(f"Added task for {selected_pet.name}.")
             else:
@@ -86,28 +94,56 @@ else:
 
 st.header("3. Today's Schedule")
 
-all_tasks = scheduler.sort_tasks_by_due_time()
-
-if not all_tasks:
-    st.warning("No tasks scheduled yet.")
+if not pets:
+    st.warning("No pets added yet.")
 else:
-    schedule_rows = []
+    col1, col2, col3 = st.columns(3)
 
-    for pet, task in all_tasks:
-        schedule_rows.append(
-            {
-                "Time": task.due_time,
-                "Pet": pet.name,
-                "Species": pet.species,
-                "Task": task.description,
-                "Duration": f"{task.duration_minutes} min",
-                "Priority": task.priority,
-                "Frequency": task.frequency,
-                "Status": "Done" if task.completed else "Pending",
-            }
-        )
+    with col1:
+        pet_filter = st.selectbox("Filter by pet", ["All"] + [pet.name for pet in pets])
 
-    st.dataframe(schedule_rows, use_container_width=True)
+    with col2:
+        status_filter = st.selectbox("Filter by status", ["All", "Pending", "Done"])
+
+    with col3:
+        priority_filter = st.selectbox("Filter by priority", ["All", "high", "medium", "low"])
+
+    completed_filter = None
+    if status_filter == "Pending":
+        completed_filter = False
+    elif status_filter == "Done":
+        completed_filter = True
+
+    selected_pet_filter = None if pet_filter == "All" else pet_filter
+    selected_priority_filter = None if priority_filter == "All" else priority_filter
+
+    schedule_tasks = scheduler.filter_tasks(
+        pet_name=selected_pet_filter,
+        completed=completed_filter,
+        priority=selected_priority_filter
+    )
+
+    if not schedule_tasks:
+        st.warning("No tasks match the selected filters.")
+    else:
+        schedule_rows = []
+
+        for pet, task in schedule_tasks:
+            schedule_rows.append(
+                {
+                    "Date": task.due_date,
+                    "Time": task.due_time,
+                    "Pet": pet.name,
+                    "Species": pet.species,
+                    "Task": task.description,
+                    "Duration": f"{task.duration_minutes} min",
+                    "Priority": task.priority,
+                    "Frequency": task.frequency,
+                    "Status": "Done" if task.completed else "Pending",
+                }
+            )
+
+        st.dataframe(schedule_rows, use_container_width=True)
 
 
 st.header("4. Pending Tasks")
@@ -122,14 +158,23 @@ else:
 
         with col1:
             st.write(
-                f"**{task.due_time}** | **{pet.name}** | "
+                f"**{task.due_date} {task.due_time}** | **{pet.name}** | "
                 f"{task.description} | {task.duration_minutes} min | "
-                f"priority: {task.priority}"
+                f"priority: {task.priority} | frequency: {task.frequency}"
             )
 
         with col2:
-            if st.button("Mark complete", key=f"complete_{pet.name}_{task.description}_{task.due_time}"):
-                task.mark_complete()
+            if st.button("Mark complete", key=f"complete_{id(task)}"):
+                next_task = scheduler.complete_task(pet, task)
+
+                if next_task:
+                    st.session_state.last_message = (
+                        f"Completed task and created next recurring task for "
+                        f"{next_task.due_date} at {next_task.due_time}."
+                    )
+                else:
+                    st.session_state.last_message = "Task marked complete."
+
                 st.rerun()
 
 

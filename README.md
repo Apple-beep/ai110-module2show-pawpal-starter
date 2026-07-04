@@ -128,3 +128,41 @@ Pending Tasks After Completing Morning Walk
 08:20 | Mochi (Cat) | Breakfast feeding | 10 min | priority: medium | frequency: daily | Pending
 09:00 | Biscuit (Dog) | Vet appointment | 60 min | priority: high | frequency: once | Pending
 10:30 | Mochi (Cat) | Clean litter box | 15 min | priority: low | frequency: daily | Pending
+```
+
+## Phase 4 Smarter Scheduling
+
+PawPal+ now includes an algorithmic scheduling layer that works across multiple pets.
+
+| Feature | Method(s) | Description |
+|---|---|---|
+| Sort by time | `Scheduler.sort_tasks_by_due_time()` | Sorts all pet care tasks by due date and due time |
+| Sort by priority | `Scheduler.sort_tasks_by_priority()` | Places high-priority tasks before medium and low-priority tasks |
+| Filter by pet/status/priority | `Scheduler.filter_tasks()` and `Scheduler.filter_by_pet()` | Filters tasks by selected pet, completion status, and priority |
+| Pending task filtering | `Scheduler.filter_pending_tasks()` | Shows only incomplete tasks across all pets |
+| Conflict detection | `Scheduler.detect_conflicts()` | Detects overlapping task windows across pets |
+| Recurring task handling | `Task.next_occurrence()` and `Scheduler.complete_task()` | Creates the next daily or weekly task when a recurring task is completed |
+
+### Phase 4 CLI Output
+
+```text
+Today's Schedule by Time
+========================
+2026-07-04 08:00 | Biscuit (Dog) | Morning walk | 30 min | priority: high | frequency: daily | Pending
+2026-07-04 08:20 | Mochi (Cat) | Breakfast feeding | 10 min | priority: medium | frequency: daily | Pending
+2026-07-04 09:00 | Biscuit (Dog) | Vet appointment | 60 min | priority: high | frequency: once | Pending
+2026-07-04 10:30 | Mochi (Cat) | Clean litter box | 15 min | priority: low | frequency: daily | Pending
+
+Tasks for Mochi
+===============
+2026-07-04 08:20 | Mochi (Cat) | Breakfast feeding | 10 min | priority: medium | frequency: daily | Pending
+2026-07-04 10:30 | Mochi (Cat) | Clean litter box | 15 min | priority: low | frequency: daily | Pending
+
+Schedule Conflicts
+==================
+Conflict: Biscuit's 'Morning walk' overlaps with Mochi's 'Breakfast feeding'
+
+Recurring Task Created
+======================
+Biscuit's next 'Morning walk' is scheduled for 2026-07-05 at 08:00.
+```
