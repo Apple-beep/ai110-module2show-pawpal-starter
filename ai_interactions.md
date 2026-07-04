@@ -38,3 +38,28 @@
 **Which approach did you use in your final implementation and why?**
 
 <!-- Your conclusion -->
+
+## Agent Workflow: Data Persistence Extension
+
+Task requested of the agent:
+Add JSON persistence so PawPal+ can remember owner, pet, and task data between app runs.
+
+Files modified:
+- `pawpal_system.py`
+- `app.py`
+- `tests/test_pawpal.py`
+- `README.md`
+- `ai_interactions.md`
+
+What the agent completed:
+- Added dictionary conversion methods for `Task`, `Pet`, and `Owner`.
+- Added `Scheduler.save_to_json()` and `Scheduler.load_from_json()`.
+- Connected the Streamlit app to `data.json`.
+- Added a pytest case for save/load behavior.
+- Updated documentation to explain the persistence workflow.
+
+Manual corrections made:
+- Fixed an indentation issue in `app.py`.
+- Kept persistence simple with custom dictionary conversion instead of adding a new serialization library.
+- Used `data.json` as a local project file to keep the extension easy to test and explain.
+- Preserved the existing OOP design instead of adding extra storage classes.

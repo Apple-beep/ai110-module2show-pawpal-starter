@@ -25,10 +25,11 @@ scheduler = Scheduler(owner)
 st.sidebar.header("Owner Info")
 
 if st.sidebar.button("Reset Demo Data"):
-    st.session_state.owner = Scheduler.load_from_json("data.json")
+    st.session_state.owner = Owner("Demo Owner", "owner@example.com")
+    Scheduler(st.session_state.owner).save_to_json("data.json")
     st.session_state.last_message = "Demo data reset."
-    scheduler.save_to_json("data.json")
-                st.rerun()
+    st.rerun()
+
 
 with st.sidebar.form("owner_form"):
     owner_name = st.text_input("Owner name", value=owner.name)
@@ -79,7 +80,12 @@ else:
         )
         due_date = st.date_input("Due date", value=date.today())
         due_time = st.time_input("Due time")
-        duration_minutes = st.number_input("Duration in minutes", min_value=5, max_value=240, step=5)
+        duration_minutes = st.number_input(
+            "Duration in minutes",
+            min_value=5,
+            max_value=240,
+            step=5
+        )
         priority = st.selectbox("Priority", ["high", "medium", "low"])
         frequency = st.selectbox("Frequency", ["once", "daily", "weekly"])
         add_task_button = st.form_submit_button("Add Task")
@@ -104,6 +110,8 @@ else:
 
 
 st.header("3. Today's Schedule")
+
+pets = owner.list_pets()
 
 if not pets:
     st.warning("No pets added yet.")
@@ -170,14 +178,15 @@ else:
 
         with col1:
             st.write(
-                f"**{task.due_date} {task.due_time}-{task.end_datetime().strftime('%H:%M')}** | **{pet.name}** | "
-                f"{task.description} | {task.duration_minutes} min | "
-                f"priority: {task.priority} | frequency: {task.frequency}"
+                f"**{task.due_date} {task.due_time}-{task.end_datetime().strftime('%H:%M')}** "
+                f"| **{pet.name}** | {task.description} | {task.duration_minutes} min "
+                f"| priority: {task.priority} | frequency: {task.frequency}"
             )
 
         with col2:
             if st.button("Mark complete", key=f"complete_{id(task)}"):
                 next_task = scheduler.complete_task(pet, task)
+                scheduler.save_to_json("data.json")
 
                 if next_task:
                     st.session_state.last_message = (
@@ -199,8 +208,10 @@ if not conflicts:
 else:
     for pet_a, task_a, pet_b, task_b in conflicts:
         st.error(
-            f"{pet_a.name}'s '{task_a.description}' overlaps with "
-            f"{pet_b.name}'s '{task_b.description}'."
+            f"{pet_a.name}'s '{task_a.description}' "
+            f"({task_a.due_time}-{task_a.end_datetime().strftime('%H:%M')}) overlaps with "
+            f"{pet_b.name}'s '{task_b.description}' "
+            f"({task_b.due_time}-{task_b.end_datetime().strftime('%H:%M')})."
         )
 
 
