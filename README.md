@@ -1,6 +1,6 @@
 # PawPal+
 
-PawPal+ is a smart pet care management system built with Python and Streamlit. It helps a pet owner track pets, schedule care tasks, view pending tasks, detect schedule conflicts, and handle recurring routines.
+PawPal+ is a smart pet care management system built with Python and Streamlit. It helps a pet owner track pets, schedule care tasks, view pending tasks, detect schedule conflicts, handle recurring routines, and save data between app runs.
 
 ## Project Overview
 
@@ -21,6 +21,7 @@ The backend logic lives in `pawpal_system.py`, the CLI demo lives in `main.py`, 
 - Detect overlapping task conflicts across multiple pets.
 - Mark tasks complete.
 - Automatically create the next daily or weekly recurring task when a recurring task is completed.
+- Save and load owner, pet, and task data using `data.json`.
 - Display the schedule in a Streamlit table with warnings and success messages.
 
 ## Core Classes
@@ -30,7 +31,7 @@ The backend logic lives in `pawpal_system.py`, the CLI demo lives in `main.py`, 
 | `Owner` | Stores owner details and manages a list of pets |
 | `Pet` | Stores pet details and manages that pet's tasks |
 | `Task` | Represents one care task with due date, due time, duration, priority, frequency, and completion status |
-| `Scheduler` | Organizes tasks across all pets using sorting, filtering, conflict detection, and recurrence logic |
+| `Scheduler` | Organizes tasks across all pets using sorting, filtering, conflict detection, recurrence logic, and JSON persistence |
 
 ## Smarter Scheduling
 
@@ -42,6 +43,7 @@ The backend logic lives in `pawpal_system.py`, the CLI demo lives in `main.py`, 
 | Pending task filtering | `Scheduler.filter_pending_tasks()` | Shows only incomplete tasks across all pets |
 | Conflict detection | `Scheduler.detect_conflicts()` | Detects overlapping task windows across multiple pets |
 | Recurring task handling | `Task.next_occurrence()` and `Scheduler.complete_task()` | Creates the next daily or weekly task when a recurring task is completed |
+| Data persistence | `Scheduler.save_to_json()` and `Scheduler.load_from_json()` | Saves and loads owner, pet, and task data from `data.json` |
 
 ## Project Structure
 
@@ -58,25 +60,3 @@ The backend logic lives in `pawpal_system.py`, the CLI demo lives in `main.py`, 
 │   └── uml_final.mmd
 └── tests/
     └── test_pawpal.py
-
-## Optional Extension: Data Persistence
-
-PawPal+ now supports JSON persistence using a local `data.json` file.
-
-When the Streamlit app starts, it tries to load saved owner, pet, and task data from `data.json`. If no file exists yet, it starts with a default demo owner. When the user updates owner info, adds a pet, adds a task, marks a task complete, or creates a recurring task, the app saves the updated data back to `data.json`.
-
-Files modified for persistence:
-
-- `pawpal_system.py`
-  - Added `to_dict()` and `from_dict()` methods for `Task`, `Pet`, and `Owner`.
-  - Added `Scheduler.save_to_json()` and `Scheduler.load_from_json()`.
-- `app.py`
-  - Loads saved data into `st.session_state`.
-  - Saves changes after user actions.
-- `tests/test_pawpal.py`
-  - Added a test verifying save/load behavior.
-
-Persistence test command:
-
-```bash
-python -m pytest
