@@ -60,3 +60,103 @@ The backend logic lives in `pawpal_system.py`, the CLI demo lives in `main.py`, 
 │   └── uml_final.mmd
 └── tests/
     └── test_pawpal.py
+```
+## Setup
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+## Running the CLI Demo
+
+```bash
+python main.py
+```
+
+## Running the Streamlit App
+
+```bash
+streamlit run app.py
+```
+
+## Sample CLI Output
+
+```text
+Today's Schedule by Time
+========================
+2026-07-04 08:00 | Biscuit (Dog) | Morning walk | 30 min | priority: high | frequency: daily | Pending
+2026-07-04 08:20 | Mochi (Cat) | Breakfast feeding | 10 min | priority: medium | frequency: daily | Pending
+2026-07-04 09:00 | Biscuit (Dog) | Vet appointment | 60 min | priority: high | frequency: once | Pending
+2026-07-04 10:30 | Mochi (Cat) | Clean litter box | 15 min | priority: low | frequency: daily | Pending
+
+Schedule Conflicts
+==================
+Conflict: Biscuit's 'Morning walk' overlaps with Mochi's 'Breakfast feeding'
+
+Recurring Task Created
+======================
+Biscuit's next 'Morning walk' is scheduled for 2026-07-05 at 08:00.
+```
+
+## Testing PawPal+
+
+Run the test suite:
+
+```bash
+python -m pytest
+```
+
+The tests cover task completion, adding tasks to pets, owner task collection, sorting by time, sorting by priority, filtering by pet/status/priority, pending task filtering, conflict detection, empty schedules, daily recurrence, weekly recurrence, one-time tasks, and JSON save/load persistence.
+
+Sample passing test output:
+
+```text
+collected 15 items
+
+tests/test_pawpal.py ............... [100%]
+
+15 passed
+```
+
+## Optional Extension: Data Persistence
+
+PawPal+ supports JSON persistence using a local `data.json` file.
+
+When the Streamlit app starts, it loads saved owner, pet, and task data from `data.json`. If no file exists, it starts with a default demo owner. When the user updates owner info, adds pets, adds tasks, marks tasks complete, or creates recurring tasks, the app saves the updated data back to `data.json`.
+
+Files modified for persistence:
+
+- `pawpal_system.py`
+  - Added `to_dict()` and `from_dict()` methods for `Task`, `Pet`, and `Owner`.
+  - Added `Scheduler.save_to_json()` and `Scheduler.load_from_json()`.
+- `app.py`
+  - Loads saved data into `st.session_state`.
+  - Saves changes after user actions.
+- `tests/test_pawpal.py`
+  - Added a test verifying save/load behavior.
+
+## Professional UI and Formatting
+
+The Streamlit UI uses structured formatting through:
+
+- `st.dataframe()` for the schedule table.
+- `st.success()` for successful actions.
+- `st.warning()` for empty states.
+- `st.error()` for schedule conflict warnings.
+- Start and end time formatting for pending tasks and conflicts.
+
+This makes the output easier to read and helps users understand scheduling conflicts without reading backend code.
+
+## Rubric Coverage
+
+PawPal+ meets the required features by including a Mermaid UML diagram, four core OOP classes, scheduler algorithms, a CLI demo, pytest coverage, documentation, and reflection.
+
+Stretch features attempted:
+
+- Advanced algorithmic capability through conflict detection and recurrence.
+- Data persistence using JSON.
+- Advanced scheduling logic through priority sorting and time overlap detection.
+- Professional UI formatting through Streamlit tables and status messages.
+- Prompt comparison documented in `ai_interactions.md`.
