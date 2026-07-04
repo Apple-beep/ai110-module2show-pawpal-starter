@@ -29,20 +29,20 @@ The backend logic lives in `pawpal_system.py`, the CLI demo lives in `main.py`, 
 | Class | Responsibility |
 |---|---|
 | `Owner` | Stores owner details and manages a list of pets |
-| `Pet` | Stores pet details and manages that pet's tasks |
+| `Pet` | Stores pet details and manages that pet tasks |
 | `Task` | Represents one care task with due date, due time, duration, priority, frequency, and completion status |
 | `Scheduler` | Organizes tasks across all pets using sorting, filtering, conflict detection, recurrence logic, and JSON persistence |
 
 ## Smarter Scheduling
 
-| Feature | Method(s) | Description |
+| Feature | Method | Description |
 |---|---|---|
 | Sort by time | `Scheduler.sort_tasks_by_due_time()` | Sorts all pet care tasks by due date and due time |
-| Sort by priority | `Scheduler.sort_tasks_by_priority()` | Places high-priority tasks before medium and low-priority tasks |
-| Filter by pet/status/priority | `Scheduler.filter_tasks()` and `Scheduler.filter_by_pet()` | Filters tasks by selected pet, completion status, and priority |
+| Sort by priority | `Scheduler.sort_tasks_by_priority()` | Places high priority tasks before medium and low priority tasks |
+| Filter by pet status and priority | `Scheduler.filter_tasks()` | Filters tasks by selected pet, completion status, and priority |
 | Pending task filtering | `Scheduler.filter_pending_tasks()` | Shows only incomplete tasks across all pets |
 | Conflict detection | `Scheduler.detect_conflicts()` | Detects overlapping task windows across multiple pets |
-| Recurring task handling | `Task.next_occurrence()` and `Scheduler.complete_task()` | Creates the next daily or weekly task when a recurring task is completed |
+| Recurring tasks | `Task.next_occurrence()` and `Scheduler.complete_task()` | Creates the next daily or weekly task when a recurring task is completed |
 | Data persistence | `Scheduler.save_to_json()` and `Scheduler.load_from_json()` | Saves and loads owner, pet, and task data from `data.json` |
 
 ## Project Structure
@@ -60,4 +60,3 @@ The backend logic lives in `pawpal_system.py`, the CLI demo lives in `main.py`, 
 │   └── uml_final.mmd
 └── tests/
     └── test_pawpal.py
-```

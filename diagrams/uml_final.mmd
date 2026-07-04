@@ -44,6 +44,8 @@ classDiagram
         +filter_pending_tasks()
         +complete_task(pet, task)
         +detect_conflicts()
+        +save_to_json(file_path)
+        +load_from_json(file_path)
     }
 
     Owner "1" --> "*" Pet : owns
