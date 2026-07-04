@@ -24,6 +24,11 @@ scheduler = Scheduler(owner)
 
 st.sidebar.header("Owner Info")
 
+if st.sidebar.button("Reset Demo Data"):
+    st.session_state.owner = Owner("Demo Owner", "owner@example.com")
+    st.session_state.last_message = "Demo data reset."
+    st.rerun()
+
 with st.sidebar.form("owner_form"):
     owner_name = st.text_input("Owner name", value=owner.name)
     owner_email = st.text_input("Owner email", value=owner.email)
@@ -44,12 +49,14 @@ with st.form("add_pet_form"):
     add_pet_button = st.form_submit_button("Add Pet")
 
     if add_pet_button:
-        if pet_name and pet_species:
+        if not pet_name or not pet_species:
+            st.error("Please enter both pet name and species.")
+        elif any(pet.name.lower() == pet_name.lower() for pet in owner.list_pets()):
+            st.error(f"{pet_name} already exists. Use a different pet name.")
+        else:
             new_pet = Pet(pet_name, pet_species, int(pet_age))
             owner.add_pet(new_pet)
             st.success(f"Added {pet_name} to {owner.name}'s pets.")
-        else:
-            st.error("Please enter both pet name and species.")
 
 
 st.header("2. Add a Care Task")
@@ -132,7 +139,8 @@ else:
             schedule_rows.append(
                 {
                     "Date": task.due_date,
-                    "Time": task.due_time,
+                    "Start": task.due_time,
+                    "End": task.end_datetime().strftime("%H:%M"),
                     "Pet": pet.name,
                     "Species": pet.species,
                     "Task": task.description,
@@ -158,7 +166,7 @@ else:
 
         with col1:
             st.write(
-                f"**{task.due_date} {task.due_time}** | **{pet.name}** | "
+                f"**{task.due_date} {task.due_time}-{task.end_datetime().strftime('%H:%M')}** | **{pet.name}** | "
                 f"{task.description} | {task.duration_minutes} min | "
                 f"priority: {task.priority} | frequency: {task.frequency}"
             )
