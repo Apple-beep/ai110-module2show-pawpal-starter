@@ -92,3 +92,39 @@ Describe your app in numbered steps so a reader can follow along without watchin
 5. <!-- Add more steps as needed -->
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
+
+## Phase 2 CLI Demo Output
+
+The backend logic was tested first through `main.py` before connecting it to the Streamlit UI.
+
+```text
+Today's Schedule by Time
+========================
+08:00 | Biscuit (Dog) | Morning walk | 30 min | priority: high | frequency: daily | Pending
+08:20 | Mochi (Cat) | Breakfast feeding | 10 min | priority: medium | frequency: daily | Pending
+09:00 | Biscuit (Dog) | Vet appointment | 60 min | priority: high | frequency: once | Pending
+10:30 | Mochi (Cat) | Clean litter box | 15 min | priority: low | frequency: daily | Pending
+
+Today's Schedule by Priority
+============================
+08:00 | Biscuit (Dog) | Morning walk | 30 min | priority: high | frequency: daily | Pending
+09:00 | Biscuit (Dog) | Vet appointment | 60 min | priority: high | frequency: once | Pending
+08:20 | Mochi (Cat) | Breakfast feeding | 10 min | priority: medium | frequency: daily | Pending
+10:30 | Mochi (Cat) | Clean litter box | 15 min | priority: low | frequency: daily | Pending
+
+Pending Tasks
+=============
+08:00 | Biscuit (Dog) | Morning walk | 30 min | priority: high | frequency: daily | Pending
+08:20 | Mochi (Cat) | Breakfast feeding | 10 min | priority: medium | frequency: daily | Pending
+09:00 | Biscuit (Dog) | Vet appointment | 60 min | priority: high | frequency: once | Pending
+10:30 | Mochi (Cat) | Clean litter box | 15 min | priority: low | frequency: daily | Pending
+
+Schedule Conflicts
+==================
+Conflict: Biscuit's 'Morning walk' overlaps with Mochi's 'Breakfast feeding'
+
+Pending Tasks After Completing Morning Walk
+===========================================
+08:20 | Mochi (Cat) | Breakfast feeding | 10 min | priority: medium | frequency: daily | Pending
+09:00 | Biscuit (Dog) | Vet appointment | 60 min | priority: high | frequency: once | Pending
+10:30 | Mochi (Cat) | Clean litter box | 15 min | priority: low | frequency: daily | Pending

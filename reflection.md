@@ -28,13 +28,11 @@ After reviewing the design, I kept the system simple and modular. I avoided addi
 
 **a. Constraints and priorities**
 
-- What constraints does your scheduler consider (for example: time, priority, preferences)?
-- How did you decide which constraints mattered most?
+The scheduler considers due time, priority, completion status, task duration, and overlapping time conflicts. Due time matters because pet care tasks need to happen at realistic times. Priority matters because important tasks like medication, walks, or vet visits should be handled before lower-priority tasks. Completion status matters because completed tasks should not appear in the pending task list.
 
 **b. Tradeoffs**
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+One tradeoff is that the scheduler detects conflicts but does not automatically reschedule them yet. This is reasonable for this stage because conflict detection is the first step toward smarter scheduling. It tells the user where the problem is instead of silently moving tasks in a way the owner may not expect.
 
 ---
 
@@ -56,13 +54,11 @@ After reviewing the design, I kept the system simple and modular. I avoided addi
 
 **a. What you tested**
 
-- What behaviors did you test?
-- Why were these tests important?
+I tested task completion, adding tasks to pets, sorting tasks by due time, and detecting scheduling conflicts. These tests are important because they verify the main workflow of the system: creating care tasks, assigning them to pets, organizing them, and identifying schedule problems.
 
 **b. Confidence**
 
-- How confident are you that your scheduler works correctly?
-- What edge cases would you test next if you had more time?
+I am confident that the basic scheduler works correctly for simple daily tasks. The tests verify the most important behaviors, and the CLI demo shows the system working end-to-end. If I had more time, I would test invalid time formats, tasks with the same start time, empty pet lists, and automatic rescheduling.
 
 ---
 
