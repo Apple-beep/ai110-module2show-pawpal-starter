@@ -12,7 +12,7 @@ st.write("A smart pet care planner for organizing daily tasks across multiple pe
 
 
 if "owner" not in st.session_state:
-    st.session_state.owner = Owner("Demo Owner", "owner@example.com")
+    st.session_state.owner = Scheduler.load_from_json("data.json")
 
 if "last_message" in st.session_state:
     st.success(st.session_state.pop("last_message"))
@@ -25,9 +25,10 @@ scheduler = Scheduler(owner)
 st.sidebar.header("Owner Info")
 
 if st.sidebar.button("Reset Demo Data"):
-    st.session_state.owner = Owner("Demo Owner", "owner@example.com")
+    st.session_state.owner = Scheduler.load_from_json("data.json")
     st.session_state.last_message = "Demo data reset."
-    st.rerun()
+    scheduler.save_to_json("data.json")
+                st.rerun()
 
 with st.sidebar.form("owner_form"):
     owner_name = st.text_input("Owner name", value=owner.name)
@@ -37,6 +38,7 @@ with st.sidebar.form("owner_form"):
     if update_owner:
         owner.name = owner_name
         owner.email = owner_email
+        scheduler.save_to_json("data.json")
         st.success("Owner information updated.")
 
 
@@ -56,6 +58,7 @@ with st.form("add_pet_form"):
         else:
             new_pet = Pet(pet_name, pet_species, int(pet_age))
             owner.add_pet(new_pet)
+            scheduler.save_to_json("data.json")
             st.success(f"Added {pet_name} to {owner.name}'s pets.")
 
 
@@ -94,6 +97,7 @@ else:
                     due_date=due_date.isoformat()
                 )
                 selected_pet.add_task(task)
+                scheduler.save_to_json("data.json")
                 st.success(f"Added task for {selected_pet.name}.")
             else:
                 st.error("Please enter a task description.")
@@ -151,7 +155,7 @@ else:
                 }
             )
 
-        st.dataframe(schedule_rows, use_container_width=True)
+        st.dataframe(schedule_rows, width="stretch")
 
 
 st.header("4. Pending Tasks")

@@ -58,3 +58,25 @@ The backend logic lives in `pawpal_system.py`, the CLI demo lives in `main.py`, 
 │   └── uml_final.mmd
 └── tests/
     └── test_pawpal.py
+
+## Optional Extension: Data Persistence
+
+PawPal+ now supports JSON persistence using a local `data.json` file.
+
+When the Streamlit app starts, it tries to load saved owner, pet, and task data from `data.json`. If no file exists yet, it starts with a default demo owner. When the user updates owner info, adds a pet, adds a task, marks a task complete, or creates a recurring task, the app saves the updated data back to `data.json`.
+
+Files modified for persistence:
+
+- `pawpal_system.py`
+  - Added `to_dict()` and `from_dict()` methods for `Task`, `Pet`, and `Owner`.
+  - Added `Scheduler.save_to_json()` and `Scheduler.load_from_json()`.
+- `app.py`
+  - Loads saved data into `st.session_state`.
+  - Saves changes after user actions.
+- `tests/test_pawpal.py`
+  - Added a test verifying save/load behavior.
+
+Persistence test command:
+
+```bash
+python -m pytest

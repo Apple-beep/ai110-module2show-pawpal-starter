@@ -232,3 +232,22 @@ def test_complete_once_task_does_not_create_recurring_task():
     assert task.completed is True
     assert next_task is None
     assert len(dog.tasks) == 1
+    
+
+def test_scheduler_save_and_load_json(tmp_path):
+    owner = Owner("Saved Owner", "saved@example.com")
+    dog = Pet("Biscuit", "Dog", 3)
+    dog.add_task(Task("Morning walk", "08:00", 30, "high", "daily", "2026-07-04"))
+
+    owner.add_pet(dog)
+
+    scheduler = Scheduler(owner)
+    file_path = tmp_path / "pawpal_data.json"
+
+    scheduler.save_to_json(file_path)
+    loaded_owner = Scheduler.load_from_json(file_path)
+
+    assert loaded_owner.name == "Saved Owner"
+    assert len(loaded_owner.pets) == 1
+    assert loaded_owner.pets[0].name == "Biscuit"
+    assert loaded_owner.pets[0].tasks[0].description == "Morning walk"

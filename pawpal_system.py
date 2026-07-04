@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 
@@ -61,6 +62,31 @@ class Task:
             due_date=next_date.isoformat()
         )
 
+    def to_dict(self):
+        """Convert this task into a JSON-safe dictionary."""
+        return {
+            "description": self.description,
+            "due_time": self.due_time,
+            "duration_minutes": self.duration_minutes,
+            "priority": self.priority,
+            "frequency": self.frequency,
+            "due_date": self.due_date,
+            "completed": self.completed,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create a Task object from saved dictionary data."""
+        return cls(
+            description=data["description"],
+            due_time=data["due_time"],
+            duration_minutes=data["duration_minutes"],
+            priority=data["priority"],
+            frequency=data.get("frequency", "once"),
+            due_date=data.get("due_date"),
+            completed=data.get("completed", False),
+        )
+
 
 @dataclass
 class Pet:
@@ -81,6 +107,26 @@ class Pet:
     def get_pending_tasks(self):
         """Return incomplete tasks for this pet."""
         return [task for task in self.tasks if task.is_pending()]
+
+    def to_dict(self):
+        """Convert this pet and its tasks into a JSON-safe dictionary."""
+        return {
+            "name": self.name,
+            "species": self.species,
+            "age": self.age,
+            "tasks": [task.to_dict() for task in self.tasks],
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create a Pet object from saved dictionary data."""
+        pet = cls(
+            name=data["name"],
+            species=data["species"],
+            age=data["age"],
+        )
+        pet.tasks = [Task.from_dict(task_data) for task_data in data.get("tasks", [])]
+        return pet
 
 
 @dataclass
@@ -104,6 +150,24 @@ class Owner:
         for pet in self.pets:
             all_tasks.extend(pet.list_tasks())
         return all_tasks
+
+    def to_dict(self):
+        """Convert this owner and all pets into a JSON-safe dictionary."""
+        return {
+            "name": self.name,
+            "email": self.email,
+            "pets": [pet.to_dict() for pet in self.pets],
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        """Create an Owner object from saved dictionary data."""
+        owner = cls(
+            name=data.get("name", "Demo Owner"),
+            email=data.get("email", "owner@example.com"),
+        )
+        owner.pets = [Pet.from_dict(pet_data) for pet_data in data.get("pets", [])]
+        return owner
 
 
 @dataclass
@@ -179,6 +243,22 @@ class Scheduler:
             pet.add_task(next_task)
 
         return next_task
+
+
+    def save_to_json(self, file_path="data.json"):
+        """Save owner, pet, and task data to a JSON file."""
+        with open(file_path, "w", encoding="utf-8") as file:
+            json.dump(self.owner.to_dict(), file, indent=2)
+
+    @staticmethod
+    def load_from_json(file_path="data.json"):
+        """Load owner, pet, and task data from a JSON file."""
+        try:
+            with open(file_path, "r", encoding="utf-8") as file:
+                data = json.load(file)
+            return Owner.from_dict(data)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return Owner("Demo Owner", "owner@example.com")
 
     def detect_conflicts(self):
         """Detect overlapping task times across all pets."""
